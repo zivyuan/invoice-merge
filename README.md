@@ -8,3 +8,8 @@
 
  - [] 增加带清单的发票支持
 
+# Setup
+
+```Shell
+pip install frontend tools opencv-python PyMuPDF fitz
+```

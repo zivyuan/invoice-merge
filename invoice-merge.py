@@ -1,4 +1,3 @@
-#! /usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -39,12 +38,12 @@ def convertPNG(pdfPath, imagePath):
         # 此处若是不做设置，默认图片大小为：792X612, dpi=96
         zoom_x = 4 #(1.33333333-->1056x816)   (2-->1584x1224)
         zoom_y = 4
-        mat = fitz.Matrix(zoom_x, zoom_y).preRotate(rotate)
-        pix = page.getPixmap(matrix=mat, alpha=False)
+        mat = fitz.Matrix(zoom_x, zoom_y).prerotate(rotate)
+        pix = page.get_pixmap(matrix=mat, alpha=False)
 
         if not path.exists(imagePath):#判断存放图片的文件夹是否存在
             makedirs(imagePath) # 若图片文件夹不存在就创建
-        pix.writePNG(imagePath+'/'+'%s-%s.png' % (basename, pg))#将图片写入指定的文件夹内
+        pix.save(imagePath+'/'+'%s-%s.png' % (basename, pg))#将图片写入指定的文件夹内
 
 
 def convertFolder(pdfFolder, target):
