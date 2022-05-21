@@ -7,6 +7,7 @@ from os import path, walk, makedirs, rmdir, remove
 import datetime
 import cv2
 import numpy as np
+import shutil
 from random import random
 from math import ceil
 
@@ -46,21 +47,32 @@ def convertPNG(pdfPath, imagePath):
         pix.save(imagePath+'/'+'%s-%s.png' % (basename, pg))#将图片写入指定的文件夹内
 
 
+def copyImage(source, target):
+    basename = path.basename(source)
+    print('   copy ', basename)
+    shutil.copyfile(source, target + '/' + basename)
+
+
 def convertFolder(pdfFolder, target):
     startTime_pdf2img = datetime.datetime.now()#开始时间
 
     patPdf = re.compile(r'\.pdf$', re.I)
+    patImg = re.compile(r'\.(png|jpeg|gif|jpg)$', re.I)
     total = 0
 
     print("PDF folder: ", pdfFolder);
     for root, dirs, files in walk(pdfFolder):
         for file in files:
+            basename = path.basename(file)
             matches = re.search(patPdf, file)
-            if matches is None:
-                continue;
-            pdf = path.realpath(path.join(root, file));
-            convertPNG(pdf, target);
-            total = total + 1
+            if matches is not None:
+                pdf = path.realpath(path.join(root, file));
+                convertPNG(pdf, target);
+                total = total + 1
+            matches = re.search(patImg, file)
+            if matches is not None:
+                img = path.realpath(path.join(root, file))
+                copyImage(img, target)
 
     endTime_pdf2img = datetime.datetime.now()#结束时间
     print('Total convert ', total, ' invoce(s).')
@@ -104,16 +116,16 @@ def mergePNG(folder, pdfName = None):
 
                 cv2.imwrite(tmpPage, img)
                 page = fitz.open(tmpPage)
-                pdfPage = fitz.open("pdf", page.convertToPDF())
-                pdf.insertPDF(pdfPage)
+                pdfPage = fitz.open("pdf", page.convert_to_pdf())
+                pdf.insert_pdf(pdfPage)
                 print("第 " + str(int(count / 2) + 1) + " 页PDF合并完成.")
             count += 1
 
     if (count % 2) == 1:
         cv2.imwrite(tmpPage, img)
         page = fitz.open(tmpPage)
-        pdfPage = fitz.open("pdf", page.convertToPDF())
-        pdf.insertPDF(pdfPage)
+        pdfPage = fitz.open("pdf", page.convert_to_pdf())
+        pdf.insert_pdf(pdfPage)
         print("第 " + str(int(count / 2) + 1) + " 页PDF合并完成.")
 
     pdf.save(output)
@@ -134,8 +146,8 @@ if __name__ == "__main__":
         exit();
 
     basename = path.basename(pdfFolder);
-    tmpFolder = pdfFolder[0:(-len(basename)-1)] + '/._tmp' + str(int(random() * 9999999 + 99999))
-    print("合并文件夹 " + sys.argv[1] +  " 里的发票");
+    tmpFolder = pdfFolder[0:(-len(basename)-1)] + '/' + basename + '.inv_assets'
+    print("合并文件夹 " + basename +  " 里的发票");
     makedirs(tmpFolder)
 
     convertFolder(pdfFolder, tmpFolder);
