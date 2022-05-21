@@ -8,7 +8,16 @@
 
  - [] 增加带清单的发票支持
 
-# Setup
+# System require
+
+Software list:
+
+- Python 3
+- frontend
+- tools
+- opencv-python
+- PyMuPDF
+- fitz
 
 ```Shell
 pip install frontend tools opencv-python PyMuPDF fitz
